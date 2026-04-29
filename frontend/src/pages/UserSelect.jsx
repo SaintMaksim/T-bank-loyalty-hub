@@ -1,10 +1,5 @@
 ﻿import { useEffect, useState } from 'react';
-import {
-  DATA_MODES,
-  getCurrentDataMode,
-  loyaltyAPI,
-  setDataMode,
-} from '../services/api';
+import { DATA_MODES, getCurrentDataMode, loyaltyAPI, setDataMode} from '../services/api';
 import UserCard from '../components/UserCard';
 import ThemeToggle from '../components/ThemeToggle';
 import logo from '../resources/logo.svg';
@@ -81,21 +76,21 @@ function UserSelect() {
           className={`btn btn-secondary ${segmentFilter === 'starter' ? 'is-active' : ''}`}
           onClick={() => setSegmentFilter('starter')}
         >
-          Низкий
+          🟢 Низкий
         </button>
         <button
           type="button"
           className={`btn btn-secondary ${segmentFilter === 'standard' ? 'is-active' : ''}`}
           onClick={() => setSegmentFilter('standard')}
         >
-          Средний
+          🔵 Средний
         </button>
         <button
           type="button"
           className={`btn btn-secondary ${segmentFilter === 'premium' ? 'is-active' : ''}`}
           onClick={() => setSegmentFilter('premium')}
         >
-          Высокий
+          🟡 Высокий
         </button>
       </div>
 

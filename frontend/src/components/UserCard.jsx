@@ -18,10 +18,9 @@ function UserCard({ user }) {
         <img className="user-card__avatar" src={user.avatar || userAvatar} alt="Аватар пользователя" />
         <div>
           <h3 className="user-card__name">{user.name}</h3>
-          <p className="muted">Финансовый сегмент: {segment.label}</p>
         </div>
       </div>
-      <p className="user-card__balance">Суммарный баланс: {formatCurrency(user.total_balance)}</p>
+      <p className="user-card__balance">Общий баланс: {formatCurrency(user.total_balance, false)}</p>
       <button type="button" className="btn btn-primary" onClick={() => navigate(`/dashboard/${user.id}`)}>
         Выбрать
       </button>
