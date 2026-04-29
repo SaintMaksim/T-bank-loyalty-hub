@@ -1,5 +1,6 @@
 ﻿import axios from 'axios';
 import { mockLoyaltySummary, mockOffers, mockPrograms, mockUsers } from './mockData';
+import userAvatar from '../resources/user.svg';
 
 const DATA_MODE_KEY = 'loyalty-data-mode';
 const CSV_USERS_KEY = 'loyalty-csv-users';
@@ -106,7 +107,7 @@ const parseUsersCsv = (csvText) => {
     name: row.name || `Пользователь ${index + 1}`,
     segment: row.segment || 'starter',
     total_balance: Number(row.total_balance || 0),
-    avatar: row.avatar || '👤',
+    avatar: row.avatar || userAvatar,
   }));
 };
 
@@ -162,7 +163,7 @@ const normalizeCsvUsers = async () => {
       name: row.full_name,
       segment: segmentToApp[row.financial_segment] || 'starter',
       total_balance: Math.round(accountsByUser[id] || 0),
-      avatar: row.financial_segment === 'HIGH' ? '👑' : '👤',
+      avatar: userAvatar,
     };
   });
 };

@@ -1,24 +1,26 @@
-﻿export const mockUsers = [
+﻿import userAvatar from '../resources/user.svg';
+
+export const mockUsers = [
   {
     id: 'user_1',
     name: 'Александр Петров',
     segment: 'starter',
     total_balance: 75000,
-    avatar: '👤',
+    avatar: userAvatar,
   },
   {
     id: 'user_2',
     name: 'Мария Иванова',
     segment: 'standard',
     total_balance: 450000,
-    avatar: '👤',
+    avatar: userAvatar,
   },
   {
     id: 'user_3',
     name: 'Дмитрий Сидоров',
     segment: 'premium',
     total_balance: 2500000,
-    avatar: '👑',
+    avatar: userAvatar,
   },
 ];
 
