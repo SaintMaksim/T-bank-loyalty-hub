@@ -4,6 +4,7 @@ import LoyaltySummary from '../components/LoyaltySummary';
 import OfferList from '../components/OfferList';
 import CrossSellBlock from '../components/CrossSellBlock';
 import Gamification from '../components/Gamification';
+import ProgramCard from '../components/ProgramCard';
 import { useLoyalty } from '../hooks/useLoyalty';
 import loyaltyPrograms from '../resources/loyaltyPrograms.svg';
 
@@ -46,6 +47,15 @@ function Dashboard() {
       </header>
 
       {summary && <LoyaltySummary summary={summary} />}
+
+      <section>
+        <h2>📊 Программы лояльности</h2>
+        <div className="grid programs-grid">
+          {programs.map((program) => (
+            <ProgramCard key={program.id} program={program} />
+          ))}
+        </div>
+      </section>
 
       <OfferList offers={segmentOffers} />
 

@@ -1,7 +1,12 @@
-﻿function OfferList({ offers }) {
+﻿import loyaltyPrograms from '../resources/loyaltyPrograms.svg';
+
+function OfferList({ offers }) {
   return (
     <section className="card">
-      <h2>🎁 Акции от партнеров</h2>
+      <h2>
+        <img src={loyaltyPrograms} className="program-card__icon" alt="" />
+        Акции от партнеров
+      </h2>
       <ul className="list">
         {offers.map((offer) => (
           <li key={offer.id} className="list-item">
