@@ -16,12 +16,24 @@ class ErrorBoundary extends Component {
     }
   }
 
+  componentDidUpdate(prevProps) {
+    if (prevProps.children !== this.props.children) {
+      if (this.state.hasError) {
+        this.setState({ hasError: false });
+      }
+    }
+  }
+
   render() {
     if (this.state.hasError) {
       return (
         <div className="page shell center">
-          <h2>Что-то пошло не так. Попробуйте обновить страницу.</h2>
-          <button className="btn btn-primary" type="button" onClick={() => window.location.reload()}>
+          <h2>Что-то пошло не так</h2>
+          <button
+            className="btn btn-primary"
+            type="button"
+            onClick={() => window.location.reload()}
+          >
             Обновить
           </button>
         </div>

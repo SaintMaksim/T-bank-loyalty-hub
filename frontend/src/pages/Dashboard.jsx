@@ -1,17 +1,14 @@
-﻿import { Link, useNavigate, useParams } from 'react-router-dom';
+﻿import { Link, useNavigate } from 'react-router-dom';
 import ThemeToggle from '../components/ThemeToggle';
 import LoyaltySummary from '../components/LoyaltySummary';
 import OfferList from '../components/OfferList';
 import CrossSellBlock from '../components/CrossSellBlock';
 import Gamification from '../components/Gamification';
-import ProgramCard from '../components/ProgramCard';
 import { useLoyalty } from '../hooks/useLoyalty';
-import loyaltyPrograms from '../resources/loyaltyPrograms.svg';
 
 function Dashboard() {
-  const { userId } = useParams();
   const navigate = useNavigate();
-  const { user, summary, programs, offers, loading, error } = useLoyalty(userId);
+  const { user, summary, offers, loading, error } = useLoyalty();
 
   if (loading) {
     return (
@@ -26,14 +23,14 @@ function Dashboard() {
     return (
       <div className="page shell center">
         <p className="error-text">{error}</p>
-        <button className="btn btn-primary" type="button" onClick={() => window.location.reload()}>
+        <button className="btn btn-primary" onClick={() => window.location.reload()}>
           Попробовать снова
         </button>
       </div>
     );
   }
 
-  const segmentOffers = offers.filter((item) => {
+  const segmentOffers = (offers || []).filter((item) => {
     if (user.segment === 'starter') return item.category !== 'investments';
     return true;
   });
@@ -41,21 +38,14 @@ function Dashboard() {
   return (
     <div className="page shell">
       <header className="topbar">
-        <button type="button" className="btn btn-secondary" onClick={() => navigate(-1)}>← Назад</button>
+        <button className="btn btn-secondary" onClick={() => navigate(-1)}>
+          ← Назад
+        </button>
         <h1>{user.name}</h1>
         <ThemeToggle />
       </header>
 
       {summary && <LoyaltySummary summary={summary} />}
-
-      <section>
-        <h2>📊 Программы лояльности</h2>
-        <div className="grid programs-grid">
-          {programs.map((program) => (
-            <ProgramCard key={program.id} program={program} />
-          ))}
-        </div>
-      </section>
 
       <OfferList offers={segmentOffers} />
 
@@ -63,7 +53,7 @@ function Dashboard() {
 
       <Gamification />
 
-      <Link to={`/analytics/${userId}`} className="btn btn-primary">
+      <Link to="/analytics" className="btn btn-primary">
         Открыть аналитику
       </Link>
     </div>

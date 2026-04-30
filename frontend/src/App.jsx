@@ -12,8 +12,8 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<UserSelect />} />
-            <Route path="/dashboard/:userId" element={<Dashboard />} />
-            <Route path="/analytics/:userId" element={<Analytics />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/analytics" element={<Analytics />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>

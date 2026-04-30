@@ -207,12 +207,6 @@ a {
   overflow: hidden;
 }
 
-.user-card__balance {
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 12px;
-}
-
 .segment-starter {
   border-left: 4px solid #34d399;
 }
@@ -434,4 +428,41 @@ a {
   .cross-sell-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: grid;
+  place-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  width: 320px;
+  display: grid;
+  gap: 10px;
+}
+
+.input {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.card.forecast-card {
+  font-size: 18px;
+  font-weight: 600;
 }
