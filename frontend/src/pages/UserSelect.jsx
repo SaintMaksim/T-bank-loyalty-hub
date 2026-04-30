@@ -1,5 +1,10 @@
 ﻿import { useEffect, useState } from 'react';
-import { DATA_MODES, getCurrentDataMode, loyaltyAPI, setDataMode} from '../services/api';
+import {
+  DATA_MODES,
+  getCurrentDataMode,
+  loyaltyAPI,
+  setDataMode,
+} from '../services/api';
 import UserCard from '../components/UserCard';
 import ThemeToggle from '../components/ThemeToggle';
 import logo from '../resources/logo.svg';
@@ -8,7 +13,9 @@ function UserSelect() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [mode, setMode] = useState(() => getCurrentDataMode());
+  const [mode, setModeState] = useState(
+    () => getCurrentDataMode() || DATA_MODES.BACKEND
+  );
   const [segmentFilter, setSegmentFilter] = useState('all');
 
   useEffect(() => {
@@ -31,7 +38,7 @@ function UserSelect() {
   const handleModeChange = (event) => {
     const nextMode = event.target.value;
     setDataMode(nextMode);
-    setMode(nextMode);
+    setModeState(nextMode);
   };
 
   const filteredUsers = users.filter((user) => {
@@ -46,47 +53,49 @@ function UserSelect() {
           <img src={logo} alt="Логотип" className="h1-icon" />
           Т-Лояльность
         </h1>
+
         <div className="topbar-controls">
           <label className="mode-switch">
             Источник данных
             <select value={mode} onChange={handleModeChange}>
-              <option value={DATA_MODES.MOCK}>Mock</option>
               <option value={DATA_MODES.BACKEND}>Backend</option>
               <option value={DATA_MODES.CSV}>CSV</option>
             </select>
           </label>
+
           <ThemeToggle />
         </div>
       </header>
 
       <h2>Выберите пользователя</h2>
+
       <div className="segment-filters">
         <div className="segment-filters__title">
           Финансовый сегмент клиента
         </div>
+
         <button
-          type="button"
           className={`btn btn-secondary ${segmentFilter === 'all' ? 'is-active' : ''}`}
           onClick={() => setSegmentFilter('all')}
         >
           Все
         </button>
+
         <button
-          type="button"
           className={`btn btn-secondary ${segmentFilter === 'starter' ? 'is-active' : ''}`}
           onClick={() => setSegmentFilter('starter')}
         >
           🟢 Низкий
         </button>
+
         <button
-          type="button"
           className={`btn btn-secondary ${segmentFilter === 'standard' ? 'is-active' : ''}`}
           onClick={() => setSegmentFilter('standard')}
         >
           🔵 Средний
         </button>
+
         <button
-          type="button"
           className={`btn btn-secondary ${segmentFilter === 'premium' ? 'is-active' : ''}`}
           onClick={() => setSegmentFilter('premium')}
         >

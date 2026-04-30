@@ -20,12 +20,19 @@ function CrossSellBlock() {
   return (
     <section className="card">
       <h2>Рекомендуем</h2>
+
       <div className="cross-sell-grid">
         {crossSellProducts.map((item) => (
           <article key={item.id} className="cross-sell-card">
             <h3>{item.title}</h3>
             <p>{item.text}</p>
-            <a className="btn btn-secondary" href="https://www.tbank.ru" target="_blank" rel="noreferrer">
+
+            <a
+              className="btn btn-secondary"
+              href="https://www.tbank.ru"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Подробнее
             </a>
           </article>

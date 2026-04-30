@@ -5,14 +5,12 @@ import airlinesProgram from '../resources/airplane.svg';
 import platinumProgram from '../resources/platinumProgram.svg';
 
 function LoyaltySummary({ summary }) {
+  if (!summary) return null;
+
   return (
     <section className="card fade-in">
       <h2 className="h2-with-icon">
-        <img
-          src={loyaltyCredits}
-          alt="Валюты кэшбека"
-          className="h2-icon"
-        />
+        <img src={loyaltyCredits} alt="Валюты кэшбека" className="h2-icon" />
         Совокупная лояльность
       </h2>
 
@@ -22,7 +20,9 @@ function LoyaltySummary({ summary }) {
             <img src={blackProgram} className="program-card__icon" alt="" />
             Кэшбек
           </span>
-          <strong className="summary-item-text">{formatCurrency(summary.rubles_cashback)}</strong>
+          <strong className="summary-item-text">
+            {formatCurrency(summary.rubles_cashback || 0)}
+          </strong>
         </div>
 
         <div className="summary-item">
@@ -30,7 +30,9 @@ function LoyaltySummary({ summary }) {
             <img src={platinumProgram} className="program-card__icon" alt="" />
             Браво
           </span>
-          <strong className="summary-item-text">{formatNumber(summary.bravo_points)}</strong>
+          <strong className="summary-item-text">
+            {formatNumber(summary.bravo_points || 0)}
+          </strong>
         </div>
 
         <div className="summary-item">
@@ -38,7 +40,9 @@ function LoyaltySummary({ summary }) {
             <img src={airlinesProgram} className="program-card__icon" alt="" />
             Мили
           </span>
-          <strong className="summary-item-text">{formatNumber(summary.airline_miles)}</strong>
+          <strong className="summary-item-text">
+            {formatNumber(summary.airline_miles || 0)}
+          </strong>
         </div>
       </div>
     </section>
