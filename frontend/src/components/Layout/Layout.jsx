@@ -28,7 +28,7 @@ const Layout = ({ children }) => {
       </main>
 
       <footer className="layout__footer">
-        <p>© 2026 Т-Банк. РадиоХак. Команда [Ваше название]</p>
+        <p>© 2026 Т-Банк. РадиоХак. Команда Monkey Business</p>
       </footer>
     </div>
   );
