@@ -1,72 +1,102 @@
-import React from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+// mobile/src/screens/DashboardScreen.js
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LOYALTY_DATA, OFFERS, getSegmentColor, getSegmentName } from '../data/mockData';
+import { api } from '../services/api';
 
-export default function DashboardScreen({ route, navigation }) {
-  // 🔧 БЕЗОПАСНЫЙ ДОСТУП: если params пустой → берём дефолт
-  const user = route.params?.user || { 
-    id: '1', 
-    name: 'Гость', 
-    segment: 'LOW', 
-    balance: 0 
+export default function DashboardScreen({ navigation }) {
+  const [summary, setSummary] = useState(null);
+  const [offers, setOffers] = useState([]);
+  const [forecast, setForecast] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      // Загружаем все данные параллельно
+      const [sum, off, fore] = await Promise.all([
+        api.getLoyaltySummary(),
+        api.getOffers(),
+        api.getForecast()
+      ]);
+      setSummary(sum);
+      setOffers(off);
+      setForecast(fore);
+    } catch (e) {
+      console.error(e);
+      Alert.alert('Ошибка', 'Не удалось загрузить данные. Проверьте соединение.');
+    } finally {
+      setLoading(false);
+    }
   };
-  
-  const loyalty = LOYALTY_DATA[user.id] || { rub: 0, bravo: 0, miles: 0, total: 0 };
-  const offers = OFFERS[user.segment] || [];
 
-  const getNextSegment = () => {
-    if (user.segment === 'LOW') return 'Standard';
-    if (user.segment === 'MEDIUM') return 'Premium';
-    return null;
+  const handleLogout = async () => {
+    await api.logout();
+    navigation.replace('UserSelect');
   };
 
-  const nextSegment = getNextSegment();
-  const hasNextSegment = nextSegment !== null;
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.center}>
+        <ActivityIndicator size="large" color="#FFDD2D" />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <ScrollView contentContainerStyle={styles.scroll}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Text style={styles.backText}>← Назад</Text>
-        </TouchableOpacity>
-
-        <Text style={styles.userName}>{user.name}</Text>
-        <View style={[styles.segmentBadge, { backgroundColor: getSegmentColor(user.segment) }]}>
-          <Text style={styles.segmentText}>{getSegmentName(user.segment)}</Text>
+        {/* Хедер с кнопкой выхода */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
+            <Text style={styles.logoutText}>Выйти</Text>
+          </TouchableOpacity>
         </View>
 
-        <View style={styles.loyaltyWidget}>
-          <Text style={styles.widgetTitle}>Ваша лояльность:</Text>
-          <Text style={styles.totalValue}>{loyalty.total.toLocaleString()} ₽</Text>
-          <View style={styles.row}>
-            <Text style={styles.rowText}>₽ {loyalty.rub}</Text>
-            <Text style={styles.rowText}>🎯 {loyalty.bravo}</Text>
-            <Text style={styles.rowText}>✈️ {loyalty.miles}</Text>
+        {/* Виджет совокупной лояльности */}
+        {summary && (
+          <View style={styles.loyaltyWidget}>
+            <Text style={styles.widgetTitle}>💰 Ваша совокупная лояльность</Text>
+            <Text style={styles.totalValue}>{summary.total_equivalent_rub.toLocaleString('ru-RU')} ₽</Text>
+            <View style={styles.row}>
+              <Text style={styles.rowItem}>₽ {summary.total_rub.toFixed(0)}</Text>
+              <Text style={styles.rowItem}>🎯 {summary.total_bravo.toFixed(0)}</Text>
+              <Text style={styles.rowItem}>✈️ {summary.total_miles.toFixed(0)}</Text>
+            </View>
           </View>
-        </View>
+        )}
 
-        <View style={styles.progressBlock}>
-          <Text style={styles.sectionTitle}>🏆 Прогресс</Text>
-          <Text style={styles.progressText}>
-            {hasNextSegment ? `До следующего уровня: ${nextSegment}` : 'Максимальный уровень!'}
-          </Text>
-          <View style={styles.progressBarBg}>
-            <View style={[styles.progressBarFill, { 
-              width: user.segment === 'LOW' ? '30%' : user.segment === 'MEDIUM' ? '70%' : '100%',
-              backgroundColor: getSegmentColor(user.segment) 
-            }]} />
+        {/* Прогноз выгоды */}
+        {forecast && (
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>📈 Прогноз на следующий месяц</Text>
+            <Text style={styles.forecastValue}>
+              ≈ {forecast.total_predicted_equivalent_rub.toLocaleString('ru-RU')} ₽
+            </Text>
+            <Text style={styles.forecastSub}>При сохранении активности (×1.2)</Text>
           </View>
-        </View>
+        )}
 
-        <Text style={styles.sectionTitle}>🎁 Акции для вас</Text>
-        {offers.map(offer => (
-          <View key={offer.id} style={styles.offerCard}>
-            <Text style={styles.offerName}>{offer.partner}</Text>
-            <Text style={styles.offerPercent}>+{offer.percent}% кэшбэк</Text>
-          </View>
-        ))}
-
+        {/* Персональные офферы */}
+        <Text style={styles.sectionTitle}>🎁 Персональные акции</Text>
+        {offers.length > 0 ? (
+          offers.map(offer => (
+            <View key={offer.id} style={styles.offerCard}>
+              <View style={styles.offerInfo}>
+                <Text style={styles.offerName}>{offer.partner_name}</Text>
+                <Text style={styles.offerDesc}>{offer.short_description}</Text>
+              </View>
+              <View style={[styles.offerBadge, { backgroundColor: offer.brand_color_hex }]}>
+                <Text style={styles.offerPercent}>+{offer.cashback_percent}%</Text>
+              </View>
+            </View>
+          ))
+        ) : (
+          <Text style={styles.emptyText}>Нет доступных акций для вашего сегмента</Text>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -75,22 +105,25 @@ export default function DashboardScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F5F5F5' },
   scroll: { padding: 20 },
-  backBtn: { marginBottom: 15 },
-  backText: { fontSize: 16, color: '#007AFF' },
-  userName: { fontSize: 24, fontWeight: 'bold' },
-  segmentBadge: { padding: 6, borderRadius: 6, alignSelf: 'flex-start', marginBottom: 20, marginTop: 5 },
-  segmentText: { color: 'white', fontWeight: '600' },
-  loyaltyWidget: { backgroundColor: '#FFDD2D', padding: 20, borderRadius: 16, marginBottom: 20 },
-  widgetTitle: { fontSize: 16, color: '#333' },
-  totalValue: { fontSize: 32, fontWeight: 'bold', color: '#1A1A1A', marginVertical: 10 },
-  row: { flexDirection: 'row', justifyContent: 'space-between' },
-  rowText: { color: '#333', fontWeight: '500' },
-  progressBlock: { backgroundColor: 'white', padding: 15, borderRadius: 12, marginBottom: 20 },
-  sectionTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 10, marginTop: 10 },
-  progressText: { marginBottom: 10, color: '#666' },
-  progressBarBg: { height: 10, backgroundColor: '#EEE', borderRadius: 5, overflow: 'hidden' },
-  progressBarFill: { height: 10, borderRadius: 5 },
-  offerCard: { backgroundColor: 'white', padding: 15, borderRadius: 10, marginBottom: 10, flexDirection: 'row', justifyContent: 'space-between' },
-  offerName: { fontWeight: '600' },
-  offerPercent: { color: '#22C55E', fontWeight: 'bold' }
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  header: { alignItems: 'flex-end', marginBottom: 10 },
+  logoutBtn: { padding: 8 },
+  logoutText: { color: '#007AFF', fontWeight: '600' },
+  loyaltyWidget: { backgroundColor: '#FFDD2D', padding: 22, borderRadius: 18, marginBottom: 20 },
+  widgetTitle: { fontSize: 16, color: '#333', marginBottom: 8 },
+  totalValue: { fontSize: 36, fontWeight: 'bold', color: '#1A1A1A', marginBottom: 10 },
+  row: { flexDirection: 'row', justifyContent: 'space-around' },
+  rowItem: { fontSize: 16, fontWeight: '500', color: '#333' },
+  card: { backgroundColor: 'white', padding: 18, borderRadius: 14, marginBottom: 20 },
+  cardTitle: { fontSize: 17, fontWeight: 'bold', marginBottom: 6 },
+  forecastValue: { fontSize: 24, fontWeight: 'bold', color: '#00BCD4' },
+  forecastSub: { fontSize: 13, color: '#888', marginTop: 4 },
+  sectionTitle: { fontSize: 19, fontWeight: 'bold', marginBottom: 12, marginTop: 4 },
+  offerCard: { backgroundColor: 'white', padding: 16, borderRadius: 12, marginBottom: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  offerInfo: { flex: 1, paddingRight: 10 },
+  offerName: { fontWeight: '700', fontSize: 15, marginBottom: 2 },
+  offerDesc: { fontSize: 13, color: '#666' },
+  offerBadge: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 },
+  offerPercent: { color: 'white', fontWeight: 'bold', fontSize: 14 },
+  emptyText: { color: '#999', textAlign: 'center', padding: 20 }
 });
