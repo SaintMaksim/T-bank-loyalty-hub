@@ -1,22 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Продакшен-сервер (уже с https)
 const API_BASE_URL = 'https://loyalty-api.emrysdev.xyz';
-
-// Тестовые пароли: user_1, user_2, user_3 и т.д. (по ID пользователя)
-const getTestPassword = (email) => {
-  const match = email.match(/user_(\d+)/);
-  if (match) return `user_${match[1]}`;
-  // Если email не в формате user_@..., пробуем извлечь ID из начала
-  const id = email.split('.')[0]?.split('@')[0]?.match(/\d+$/)?.[0];
-  return id ? `user_${id}` : '12345'; // fallback
-};
 
 const getToken = async () => await AsyncStorage.getItem('access_token');
 const setToken = async (token) => await AsyncStorage.setItem('access_token', token);
 const clearToken = async () => await AsyncStorage.removeItem('access_token');
 
-// Универсальный запрос с автоматической подстановкой токена
 const request = async (endpoint, options = {}) => {
   const token = await getToken();
   const headers = {
@@ -39,6 +28,7 @@ const request = async (endpoint, options = {}) => {
 };
 
 export const api = {
+  // 🔐 Авторизация
   login: async (email, password) => {
     const params = new URLSearchParams({ username: email, password });
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
@@ -57,19 +47,69 @@ export const api = {
     return data;
   },
 
-  // Выход
   logout: async () => {
     await clearToken();
   },
 
-  // Публичные эндпоинты (не требуют авторизации)
+  // 👥 Публичные эндпоинты
   getUsers: () => request('/users/'),
 
-  // Эндпоинты, требующие авторизации
+  // 🔐 Эндпоинты с авторизацией
   getMe: () => request('/users/me'),
   getLoyaltySummary: () => request('/loyalty/summary'),
   getLoyaltyHistory: () => request('/loyalty/history'),
   getMonthlyHistory: () => request('/loyalty/history/monthly'),
   getForecast: () => request('/loyalty/forecast'),
   getOffers: () => request('/offers/'),
+
+  // 🤖 ИИ-рекомендации (с моком, если бэкенд не готов)
+  getAiRecommend: async () => {
+    try {
+      return await request('/ai/recommend');
+    } catch (e) {
+      // Возвращаем моковые данные для демо
+      console.debug('🤖 AI recommend using mock');
+      return { 
+        recommendation: "Подключите программу «Браво» — при ваших тратах это даст +300 ₽ в месяц" 
+      };
+    }
+  },
+
+  // 🔥 Стрик посещений (с моком, если бэкенд не готов)
+  getStreak: async () => {
+    try {
+      return await request('/gamification/streak');
+    } catch (e) {
+      // Возвращаем моковые данные для демо
+      console.debug('🔥 Streak using mock');
+      return { 
+        streak_count: 3,
+        max_streak: 5,
+        last_visit_date: "2026-04-29",
+        next_milestone: {
+          days: 4,
+          bonus_rub: 500,
+          achievement: "Недельная серия"
+        },
+        days_until_next: 4,
+        visited_today: false
+      };
+    }
+  },
+
+  // Трек визита (тихо игнорируем ошибки — не критично)
+  trackVisit: async () => {
+    try {
+      const token = await getToken();
+      await fetch(`${API_BASE_URL}/gamification/streak/visit`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+    } catch (e) {
+      // Игнорируем — это не блокирует работу приложения
+    }
+  },
 };
