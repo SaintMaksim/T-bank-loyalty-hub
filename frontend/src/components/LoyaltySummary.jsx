@@ -20,17 +20,17 @@ function LoyaltySummary({ summary }) {
         <div className="summary-item">
           <span className="summary-item__label">
             <img src={blackProgram} className="program-card__icon" alt="" />
-            Рубли кэшбэка
+            Кэшбек
           </span>
-          <strong>{formatCurrency(summary.rubles_cashback)}</strong>
+          <strong className="summary-item-text">{formatCurrency(summary.rubles_cashback)}</strong>
         </div>
 
         <div className="summary-item">
           <span className="summary-item__label">
             <img src={platinumProgram} className="program-card__icon" alt="" />
-            Баллы Браво
+            Браво
           </span>
-          <strong>{formatNumber(summary.bravo_points)}</strong>
+          <strong className="summary-item-text">{formatNumber(summary.bravo_points)}</strong>
         </div>
 
         <div className="summary-item">
@@ -38,7 +38,7 @@ function LoyaltySummary({ summary }) {
             <img src={airlinesProgram} className="program-card__icon" alt="" />
             Мили
           </span>
-          <strong>{formatNumber(summary.airline_miles)}</strong>
+          <strong className="summary-item-text">{formatNumber(summary.airline_miles)}</strong>
         </div>
       </div>
     </section>
