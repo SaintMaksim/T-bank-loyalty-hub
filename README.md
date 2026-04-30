@@ -1,23 +1,49 @@
 #  RadioHack 3.0: Единый раздел лояльности Т-Банка
+## 👥 Команда Monkey Business
 
-> **Команда:** Monkey Business
-> **Треки:** Лояльность, AI, UX
+| Роль | Участник |
+|------|----------|
+| 🧑‍💻 Тимлид / Мобильная разработка | Таран Максим |
+|  Бэкенд | Илья Усольцев |
+| 🌐 Фронтенд | Тимофей Попов |
+| 📊 Аналитика | Виктория Хрущёва |
+| 🎨 Дизайн | Лидия Дёмина |
 
 ## 🔗 Ссылки на компоненты системы
 Так как мы используем моно-репозиторий для ускорения разработки:
-- 📦 **Бэкенд (API):** Папка `/backend` (Python/FastAPI)
+- 📦 **Бэкенд (API):** Ссылка на репозиторий бекенда - `https://github.com/repen7ant/LoyaltyHub.git`
 - 🖥 **Фронтенд (Web):** Папка `/frontend` (React)
-- 🎨 **Дизайн:** Пока нету
-- 🚀 **Демо:** Пока нету
+- Мобильная версия (Mobile):** Папка `/mobile` (Expo)
+- 🎨 **Дизайн:** `https://www.figma.com/design/ZfYVQW58eeDxjK4qpr7gQb/T-Bank_Loyalty_Hackathon?node-id=0-1&t=sLScJ7pTWAusoC99-1`
 
 ## 📖 О проекте
-Мы разработали единый раздел лояльности, который агрегирует кэшбэк (рубли), баллы "Браво" и мили All Airlines в одном месте. Решение сегментирует пользователей по финансовому статусу и предлагает персональные офферы.
+Единый дашборд, который агрегирует кэшбэк (₽), баллы «Браво» и мили All Airlines.
+Сегментирует пользователей (Start/Standart/Premium) и показывает персональные офферы + ИИ-рекомендации.
+
+# Ключевые гипотезы:
+- 💰 **Совокупная выгода сверху — пользователь сразу видит «сколько выигрываю»**
+- ↔️ **Акции в горизонтальном скролле — не перегружают экран**
+- 🤖 **ИИ-совет по сегменту — повышает релевантность и доверие**
+- 🔥 **Стрик + прогресс-бар — мотивируют заходить чаще (геймификация)**
+
 
 ## 🛠 Стек технологий
-- **Backend:** Python 3.12, FastAPI, PostgreSQL, SQLAlchemy (async), Alembic, asyncpg / psycopg2, JWT (python-jose), pwdlib (bcrypt), uv.
-- **Frontend:** React 18, Vite, React Router, Recharts (графики), Tailwind/MUI.
-- **DevOps:** GitHub Actions (CI/CD), Docker / Docker Compose, Nginx.
+- **Backend:** Python 3.10+, FastAPI, Pydantic.
+- **Frontend:** React 18, Vite, React Router, Tailwind/MUI.
+- **DevOps:** GitHub Actions (CI/CD).
 
 ## 🚀 Как запустить локально
-1. **Backend:** `cd backend && pip install -r requirements.txt && uvicorn main:app --reload`
-2. **Frontend:** `cd frontend && npm install && npm run dev`
+- **Backend:** - Инструкция по запуску бэкенда — в репозитории бэкенда.
+- **Frontend:**
+  ```bash
+  cd frontend
+  npm install
+  npm run dev
+  ```
+- **Mobile:**
+  ```bash
+  cd mobile
+  npm install
+  npx expo start
+  ```
+## 
