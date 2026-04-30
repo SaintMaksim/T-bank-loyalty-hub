@@ -14,9 +14,9 @@
 Мы разработали единый раздел лояльности, который агрегирует кэшбэк (рубли), баллы "Браво" и мили All Airlines в одном месте. Решение сегментирует пользователей по финансовому статусу и предлагает персональные офферы.
 
 ## 🛠 Стек технологий
-- **Backend:** Python 3.10+, FastAPI, Pandas (анализ CSV), Pydantic.
+- **Backend:** Python 3.12, FastAPI, PostgreSQL, SQLAlchemy (async), Alembic, asyncpg / psycopg2, JWT (python-jose), pwdlib (bcrypt), uv.
 - **Frontend:** React 18, Vite, React Router, Recharts (графики), Tailwind/MUI.
-- **DevOps:** GitHub Actions (CI/CD).
+- **DevOps:** GitHub Actions (CI/CD), Docker / Docker Compose, Nginx.
 
 ## 🚀 Как запустить локально
 1. **Backend:** `cd backend && pip install -r requirements.txt && uvicorn main:app --reload`
