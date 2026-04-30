@@ -1,90 +1,244 @@
-# API Contract для бэкенда
+# API Contract
 
-Все эндпоинты возвращают JSON. Ошибки – стандартные HTTP коды.
+Все эндпоинты возвращают JSON. Авторизация через Bearer токен (кроме отмеченных).
+Ошибки — стандартные HTTP коды.
 
-## GET /api/users
-Список пользователей для тестового переключения.
+## Авторизация
 
-Ответ:
-[
-  { "id": 1, "full_name": "Иванов Дмитрий Иванович", "segment": "LOW" },
-  { "id": 30, "full_name": "Морозов Кирилл Михайлович", "segment": "MEDIUM" }
-]
+### POST /auth/login
 
-## GET /api/users/{user_id}/loyalty
-Совокупная лояльность + прогноз.
+Авторизация по email и паролю. Возвращает JWT токен.
 
-Ответ:
+Тестовые пользователи: пароль `user_{id}`, например `user_1` для первого пользователя.
+
+Request (form-data):
+
+```
+username: dmitriy.ivanov29@yandex.ru
+password: user_1
+```
+
+Response:
+
+```json
 {
-  "user_id": 1,
-  "total_equivalent_rub": 12500.50,
-  "breakdown": {
-    "rub": 5000,
-    "miles": 2000,
-    "bravo_points": 3000
-  },
-  "forecast_next_month": {
-    "value": 2080,
-    "message": "Если продолжите, получите ~2080 ₽ кэшбэка"
-  }
+  "access_token": "eyJ...",
+  "token_type": "bearer"
 }
+```
 
-## GET /api/users/{user_id}/history
-Помесячная история начислений.
+---
 
-Ответ:
-{
-  "user_id": 1,
-  "history": [
-    { "month": "2026-01", "rub": 120, "miles": 0, "bravo_points": 50 },
-    { "month": "2026-02", "rub": 140, "miles": 10, "bravo_points": 70 }
-  ]
-}
+## Пользователи
 
-## GET /api/users/{user_id}/offers
-Акции партнёров с учётом сегмента.
+### GET /users
 
-Ответ:
+Список всех тестовых пользователей. Авторизация не требуется.
+Используется как стартовая точка — выбор пользователя перед входом.
+
+Response:
+
+```json
 [
   {
-    "partner_name": "МастерМинутка",
-    "description": "Бытовой ремонт",
-    "cashback_percent": 10,
-    "logo_url": "https://...",
-    "brand_color": "#E74C3C"
+    "id": 1,
+    "full_name": "Иванов Дмитрий Иванович",
+    "email": "dmitriy.ivanov29@yandex.ru",
+    "financial_segment": "LOW"
   }
 ]
+```
 
-## GET /api/users/{user_id}/cross-sell
-Кросс-селл продукты экосистемы.
+### GET /users/me
 
-Ответ:
+Данные текущего авторизованного пользователя. Требует токен.
+
+Response:
+
+```json
+{
+  "id": 1,
+  "email": "dmitriy.ivanov29@yandex.ru",
+  "phone_number": "+7 994 204-96-79",
+  "full_name": "Иванов Дмитрий Иванович",
+  "financial_segment": "LOW"
+}
+```
+
+---
+
+## Лояльность
+
+Все эндпоинты требуют авторизацию. Данные возвращаются для текущего пользователя из токена.
+
+### GET /loyalty/summary
+
+Совокупная лояльность пользователя по всем счетам и программам.
+Все валюты приводятся к рублёвому эквиваленту по формуле:
+`total_equivalent_rub = rub + miles × 2.0 + bravo × 0.5`
+
+Response:
+
+```json
+{
+  "total_rub": 5000.0,
+  "total_miles": 2000.0,
+  "total_bravo": 3000.0,
+  "total_equivalent_rub": 11500.0,
+  "accounts": [
+    {
+      "account_id": 1,
+      "loyalty_program_name": "Black",
+      "cashback_currency": "rub",
+      "current_balance": 5000.0
+    }
+  ]
+}
+```
+
+### GET /loyalty/history
+
+Полная история начислений кэшбэка. Отсортирована по дате — сначала новые.
+
+Response:
+
+```json
 [
-  { "name": "Т-Мобайл", "icon": "📱", "description": "Мобильная связь с кэшбэком" },
-  { "name": "Т-Инвестиции", "icon": "📈", "description": "Инвестируйте с умом" }
+  {
+    "transaction_id": 1,
+    "account_id": 1,
+    "loyalty_program_name": "Black",
+    "cashback_currency": "rub",
+    "cashback_amount": 163.0,
+    "payout_date": "2025-02-23"
+  }
 ]
+```
 
-## GET /api/users/{user_id}/gamification
-Уровень и прогресс.
+### GET /loyalty/history/monthly
 
-Ответ:
+История начислений сгруппированная по месяцам. Используется для графика динамики.
+
+Response:
+
+```json
+[
+  {
+    "month": "2025-02",
+    "total_rub": 500.0,
+    "total_miles": 0.0,
+    "total_bravo": 200.0,
+    "total_equivalent_rub": 600.0
+  }
+]
+```
+
+### GET /loyalty/forecast
+
+Прогноз выгоды на следующий месяц.
+Формула: среднее за последние 3 месяца × 1.2 (коэффициент роста активности).
+
+Response:
+
+```json
+{
+  "forecasts": [
+    {
+      "loyalty_program_name": "Black",
+      "cashback_currency": "rub",
+      "predicted_amount": 600.0,
+      "predicted_equivalent_rub": 600.0
+    }
+  ],
+  "total_predicted_equivalent_rub": 1400.0
+}
+```
+
+---
+
+## Офферы
+
+### GET /offers/
+
+Персональные предложения партнёров и продукты экосистемы Т-Банка.
+Фильтруются по финансовому сегменту текущего пользователя.
+Сортировка: сначала продукты экосистемы (ECOSYSTEM), затем партнёры по убыванию % кэшбэка.
+Продукты экосистемы исключаются если пользователь уже имеет этот продукт.
+
+Response:
+
+```json
+[
+  {
+    "id": 1,
+    "partner_name": "МастерМинутка",
+    "short_description": "Бытовой ремонт",
+    "logo_url": "https://...",
+    "brand_color_hex": "#E74C3C",
+    "cashback_percent": 10.0,
+    "financial_segment": "HIGH"
+  }
+]
+```
+
+---
+
+## Геймификация (в разработке)
+
+### GET /gamification/level
+
+Уровень лояльности и прогресс до следующего.
+
+Уровни на основе `total_equivalent_rub`:
+
+- Бронза: 0 – 5 000 ₽
+- Серебро: 5 000 – 15 000 ₽
+- Золото: 15 000 – 30 000 ₽
+- Платина: > 30 000 ₽
+
+Response:
+
+```json
 {
   "level": "Бронза",
   "next_level": "Серебро",
   "progress": 0.42,
-  "total_rub_cashback": 2100,
-  "needed_for_next": 2900
+  "total_equivalent_rub": 2100.0,
+  "needed_for_next": 2900.0
 }
+```
 
-## GET /api/users/{user_id}/ai-recommend
-ИИ-совет.
+### GET /gamification/achievements
 
-Ответ:
+Список ачивок пользователя (полученные и нет).
+
+Response:
+
+```json
+[
+  {
+    "id": "cashback_start",
+    "name": "Кэшбэк-старт",
+    "description": "Накоплено 500 ₽ эквивалента",
+    "unlocked": true,
+    "bonus": 50.0
+  }
+]
+```
+
+---
+
+## ИИ-рекомендации (в разработке)
+
+### GET /ai/recommend
+
+Персонализированная рекомендация от ИИ на основе данных пользователя.
+Использует Gemini API — анализирует историю начислений, текущие балансы и сегмент.
+
+Response:
+
+```json
 {
-  "recommendation": "Начните с программы Black – простой рублёвый кэшбэк."
+  "recommendation": "У вас накоплено 2000 миль — этого хватит на перелёт внутри России. Рекомендуем активировать акцию All Airlines у партнёра X для ускоренного накопления."
 }
-
-## Примечания для бэкенда
-- Расчёты total_equivalent_rub и forecast по формулам из loyalty-metrics.md
-- Фильтрация офферов по financial_segment – обязательна
-- Для history группировать по месяцам (YYYY-MM)
+```
