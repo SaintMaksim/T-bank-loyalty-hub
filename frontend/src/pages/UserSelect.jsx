@@ -1,10 +1,5 @@
 ﻿import { useEffect, useState } from 'react';
-import {
-  DATA_MODES,
-  getCurrentDataMode,
-  loyaltyAPI,
-  setDataMode,
-} from '../services/api';
+import { loyaltyAPI } from '../services/api';
 import UserCard from '../components/UserCard';
 import ThemeToggle from '../components/ThemeToggle';
 import logo from '../resources/logo.svg';
@@ -13,9 +8,6 @@ function UserSelect() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [mode, setModeState] = useState(
-    () => getCurrentDataMode() || DATA_MODES.BACKEND
-  );
   const [segmentFilter, setSegmentFilter] = useState('all');
 
   useEffect(() => {
@@ -33,13 +25,7 @@ function UserSelect() {
     };
 
     loadUsers();
-  }, [mode]);
-
-  const handleModeChange = (event) => {
-    const nextMode = event.target.value;
-    setDataMode(nextMode);
-    setModeState(nextMode);
-  };
+  }, []);
 
   const filteredUsers = users.filter((user) => {
     if (segmentFilter === 'all') return true;
@@ -55,14 +41,6 @@ function UserSelect() {
         </h1>
 
         <div className="topbar-controls">
-          <label className="mode-switch">
-            Источник данных
-            <select value={mode} onChange={handleModeChange}>
-              <option value={DATA_MODES.BACKEND}>Backend</option>
-              <option value={DATA_MODES.CSV}>CSV</option>
-            </select>
-          </label>
-
           <ThemeToggle />
         </div>
       </header>

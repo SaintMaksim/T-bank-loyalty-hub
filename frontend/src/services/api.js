@@ -1,15 +1,9 @@
 ﻿import axios from 'axios';
 
-const DATA_MODE_KEY = 'loyalty-data-mode';
 const TOKEN_KEY = 'access_token';
 
-export const DATA_MODES = {
-  BACKEND: 'backend',
-  CSV: 'csv',
-};
-
 const api = axios.create({
-  baseURL: 'http://localhost:8001',
+  baseURL: 'https://loyalty-api.emrysdev.xyz',
   timeout: 5000,
 });
 
@@ -23,14 +17,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-const getDataMode = () => localStorage.getItem(DATA_MODE_KEY);
-
-export const setDataMode = (mode) => {
-  localStorage.setItem(DATA_MODE_KEY, mode);
-};
-
-export const getCurrentDataMode = () => getDataMode();
-
 export const loyaltyAPI = {
   login: async (email, password) => {
     const params = new URLSearchParams();
@@ -43,6 +29,8 @@ export const loyaltyAPI = {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
     });
+
+    console.log('LOGIN RESPONSE:', res.data);
 
     const token = res.data.access_token;
     localStorage.setItem(TOKEN_KEY, token);
@@ -124,11 +112,18 @@ export const loyaltyAPI = {
     return res.data.map((item) => ({
       id: `offer_${item.id}`,
       partner: item.partner_name,
-      cashback_percent: item.cashback_percent,
+      cashback_percent: item.cashback_percent || 0,
       category: (item.short_description || 'partner')
         .toLowerCase()
         .replace(/\s+/g, '_'),
       description: item.short_description,
+      logo_url: item.logo_url,
+      color: item.brand_color_hex,
     }));
+  },
+
+  getAIRecommendation: async () => {
+    const res = await api.get('/ai/recommend');
+    return res.data.recommendation;
   },
 };

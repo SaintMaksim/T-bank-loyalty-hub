@@ -10,8 +10,15 @@ function LoyaltySummary({ summary }) {
   return (
     <section className="card fade-in">
       <h2 className="h2-with-icon">
-        <img src={loyaltyCredits} alt="Валюты кэшбека" className="h2-icon" />
-        Совокупная лояльность
+        <img
+          src={loyaltyCredits}
+          alt="Валюты кэшбека"
+          className="h2-icon"
+        />
+        Совокупная лояльность{' '}
+        <strong>
+          {formatCurrency(summary.total_equivalent)}
+        </strong>
       </h2>
 
       <div className="summary-grid">
@@ -21,7 +28,7 @@ function LoyaltySummary({ summary }) {
             Кэшбек
           </span>
           <strong className="summary-item-text">
-            {formatCurrency(summary.rubles_cashback || 0)}
+            {formatCurrency(summary.rubles_cashback)}
           </strong>
         </div>
 
@@ -31,7 +38,7 @@ function LoyaltySummary({ summary }) {
             Браво
           </span>
           <strong className="summary-item-text">
-            {formatNumber(summary.bravo_points || 0)}
+            {formatNumber(summary.bravo_points)}
           </strong>
         </div>
 
@@ -41,7 +48,7 @@ function LoyaltySummary({ summary }) {
             Мили
           </span>
           <strong className="summary-item-text">
-            {formatNumber(summary.airline_miles || 0)}
+            {formatNumber(summary.airline_miles)}
           </strong>
         </div>
       </div>
